@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <title>CPSC 487/587</title>
-    <script src="../../js/setup/setup_mathjax.js"></script>
+    <script src="../js/setup/setup_mathjax.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lil-gui@0.19.1/dist/lil-gui.umd.min.js"></script>
@@ -26,6 +26,10 @@
     // todo: use a forEach loop on this array to calculate the factorial 10!
     // todo: then print the answer to the document using print_var_to_document
     let a = [1,2,3,4,5,6,7,8,9,10];
+    let factorial = 1;
+    a.forEach((element) => factorial *= element);
+
+    print_var_to_document(factorial);
 
 </script>
 </body>

@@ -22,8 +22,65 @@
 <body>
 <script type="module">
     import {ThreeEngine} from "../js/utils/utils_three.js";
+    import * as THREE from 'three';
 
     // todo: draw a sphere in a 3D ThreeEngine scene at the point [1,1,1] with radius 0.1, color 0x00eeff, and opacity 0.7
+
+    // we first set up the scene
+    const scene = new THREE.Scene();
+    const aspect = window.innerWidth / window.innerHeight;
+    const camera = new THREE.PerspectiveCamera(65, aspect, 0.1, 1000);
+
+    // then we instantiate the renderer and add to dom
+    const renderer = new THREE.WebGLRenderer();
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // let there be light
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(2,1,1);
+    light.target.position.set(1,1,1);
+    light.castShadow = true;
+    scene.add(light);
+
+    // now we create the sphere
+    const geometry = new THREE.SphereGeometry(0.1,32,32);
+    const material = new THREE.MeshBasicMaterial({
+        color: 0x00eeff, 
+        opacity: 0.7,
+    });
+    const sphere = new THREE.Mesh(geometry, material);
+    sphere.position.x = 1;
+    sphere.position.y = 1;
+    sphere.position.z = 1;
+    sphere.castShadow = true;
+    scene.add(sphere);
+
+    camera.position.y = 0;
+    camera.position.x = 1;
+    camera.position.z = 1.5;
+    camera.lookAt(1,1,1);
+
+    // create plane that receives shadows
+    const planeGeometry = new THREE.PlaneGeometry(5,5,32,32);
+    const planeMaterial = new THREE.MeshStandardMaterial({
+        color:0x00ff00,
+    });
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.position.x= 1;
+    plane.position.y = 1;
+    plane.position.z = 0.9;
+    plane.receiveShadow = true;
+    scene.add(plane);
+
+    // render scene completely
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+    animate();
 
 </script>
 </body>

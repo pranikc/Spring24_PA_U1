@@ -22,12 +22,85 @@
 <body>
 <script type="module">
     import {ThreeEngine} from "../js/utils/utils_three.js";
+    import * as THREE from "three";
 
     // todo: using the parametric version of a circle [r*cos(\theta), r*sin(\theta)], draw a sphere (of radius 0.05, any color opacity you want)
     // todo: in a 2D ThreeEngine scene such that it revolves around the origin (0,0) at an orbit one unit away.  One revolution around
     // todo: the center should always take 1 second.  Also, draw a vector rooted at the origin so that it's always pointing at the sphere
     // todo: as it revolves around the center as well.  All optional parameters for the vector can be left as the default.
     // todo: note that sin and cosine in javascript can be called using Math.sin() and Math.cos()
+    const scene = new THREE.Scene();
+    const frustumSize = 10;
+    const aspect = window.innerWidth / window.innerHeight;
+    const frustumHalfHeight = frustumSize / 2;
+    const frustumHalfWidth = frustumHalfHeight * aspect;
+    const camera = new THREE.OrthographicCamera(
+        -frustumHalfWidth,
+        frustumHalfWidth,
+        frustumHalfHeight,
+        -frustumHalfHeight,
+        1,
+        1000
+    );
+    scene.add(camera);
+
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(0,0,1.5);
+    light.target.position.set(0,0,0);
+    light.castShadow = true;
+    scene.add(light);
+
+    // now we create the sphere
+    const geometry = new THREE.SphereGeometry(0.1,32,32);
+    const material = new THREE.MeshBasicMaterial({
+        color: 0x00eeff, 
+        opacity: 0.7,
+    });
+    const sphere = new THREE.Mesh(geometry, material);
+    sphere.position.x = 1;
+    scene.add(sphere);
+
+    // create the vector
+    const from = new THREE.Vector3(0,0,0);
+    const to = new THREE.Vector3(1,0,0);
+    var direction = to.clone().sub(from);
+    var length = direction.length();
+    var arrowHelper = new THREE.ArrowHelper(direction, from, length, 0xFF0000, 0.15);
+    arrowHelper.line.material.linewidth = 0.01;
+    arrowHelper.line.material.opacity = 0.9;
+    scene.add(arrowHelper);
+
+    camera.position.z = 1.5;
+    camera.lookAt(0,0,0);
+    
+    var theta = 0;
+    const clock = new THREE.Clock();
+    const n_points = 100;
+    function animate() {
+        clock.getDelta();
+        requestAnimationFrame(animate);
+        if (clock.elapsedTime >= 1/n_points) {
+            theta = theta + (1/n_points)*2*Math.PI;
+
+            clock.stop();
+        }
+
+        sphere.position.x = Math.cos(theta)
+        sphere.position.y = Math.sin(theta);
+
+        const to = new THREE.Vector3(sphere.position.x,sphere.position.y,0);
+        const direction = to.clone().sub(from);
+        const length = direction.length();
+        arrowHelper.setDirection(direction);
+        arrowHelper.setLength(length);
+
+        renderer.render(scene, camera);
+    }
+    animate();
 
 </script>
 </body>

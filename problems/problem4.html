@@ -22,9 +22,61 @@
 <body>
 <script type="module">
     import {ThreeEngine} from "../js/utils/utils_three.js";
+    import * as THREE from 'three';
 
     // todo: draw a line segment in a 3D ThreeEngine scene with a start point of [-1,-1,1], an end point of [1,1,1],
     // todo: not rendering through other objects, a width of 0.01, a color of 0x000000, and an opacity of 0.9
+
+    const scene = new THREE.Scene();
+    const aspect = window.innerWidth / window.innerHeight;
+    const camera = new THREE.PerspectiveCamera(65, aspect, 1000, 0.1);
+
+    const renderer = new THREE.WebGLRenderer();
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0xffffff, 0);
+    document.body.appendChild(renderer.domElement);
+
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1,0,1.5);
+    light.target.position.set(0,0,0);
+    light.castShadow = true;
+    scene.add(light);
+
+    const planeGeometry = new THREE.PlaneGeometry(1,1,32,32);
+    const planeMaterial = new THREE.MeshStandardMaterial({
+        color:0x00ff00,
+    });
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.receiveShadow = true;
+    scene.add(plane);
+
+    const points = [];
+    points.push(new THREE.Vector3(-1,-1,1));
+    points.push(new THREE.Vector3(1,1,1));
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+    const material = new THREE.LineBasicMaterial({
+        color: 0x000000,
+        opacity: 0.9,
+        linewidth: 0.01,
+    });
+
+    const line = new THREE.Line(geometry, material);
+    line.castShadow = true;
+    scene.add(line);
+
+    camera.position.z = 1.5;
+    camera.position.x = 0;
+    camera.position.y = -3;
+    camera.lookAt(0,0,0);
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+    animate();
 
 </script>
 </body>
